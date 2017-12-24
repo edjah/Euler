@@ -1,58 +1,38 @@
 from time import perf_counter
+from prime import prime_factors_table
+from itertools import combinations
+from functools import reduce
 start = perf_counter()
 
-def close_to_int(a):
-    return abs(round(a) - a) < 1e-8
+
+facs = prime_factors_table(10 ** 6)
+
+def prod(a):
+    return reduce(lambda x, y: x * y, a)
+
+def num_solutions(n):
+    uniq = set(facs[n])
+    nums = [2 * facs[n].count(x) for x in sorted(uniq)]
+
+    count = 1
+    if (n == 180180):
+        print(nums)
+    for m in range(1, len(nums) + 1):
+        for tup in combinations(nums, m):
+            count += prod(tup)
+
+    return (count + 1) // 2
 
 
-def diophantine_reciprocal_count(n):
-    count = 0
-    for i in range(n + 1, 2*n + 1):
-        if close_to_int(1/(1/n - 1/i)):
-            count += 1
-    return count
+best = 0
+for n in range(10 ** 6):
+    x = num_solutions(n)
+    if x > best:
+        print(f"New best: {n} has {x} solutions")
+        best = x
 
-from prime import read_primes
-
-# n = 1
-# m = (0, 0)
-# a = diophantine_reciprocal_count(n)
-# while a <= 1000:
-#     if n % 100 == 0:
-#         print('%d: current max:' % n, m[0], '@', m[1])
-#         print(prime.prime_factors(m[1]),'\n\n')
-
-#     n += 1
-#     a = diophantine_reciprocal_count(n)
-#     if a > m[0]:
-#         m = (a, n)
-# print(n, ':', a)
-
-def g_hamming_nums(lim, n):
-    primes = read_primes(n)
-    nums = set()
-    seen = set()
-    def helper(k, idx):
-        if k > lim or idx >= len(primes):
-            return
-        nums.add(k)
-        helper(k * primes[idx], idx)
-        helper(k * primes[idx], idx + 1)
-    helper(1, 0)
-    return sorted(nums)
-
-nums = g_hamming_nums(10 ** 6, 100)
-print(len(nums))
-m = (0, 0)
-for i, n in enumerate(nums):
-    if i % 100 == 0:
-        print('%d: %d = max: %d @ %d' % (i, n, m[0], m[1]))
-    a = diophantine_reciprocal_count(n)
-    if a > 1000:
-        print('Solution:', n)
+    if x > 1000:
         break
-    if a > m[0]:
-        m = (a, n)
 
 end = perf_counter()
-print(end - start, 'seconds to run')
+print(f"{end - start:f} seconds to run")

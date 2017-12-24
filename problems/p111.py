@@ -5,7 +5,7 @@ start = perf_counter()
 
 def A(n, d):
     orig = [str(d)] * n
-    str_digits = [str(c) for c in range(10)]
+    str_digits = [str(c) for c in range(10) if c != d]
     ans = []
 
     for r in range(1, n - 1):
@@ -31,7 +31,7 @@ for d in range(10):
     m = str(x[0]).count(str(d))
     n = len(x)
     s = sum(x)
-    print('Dig: %d | M: %2d | N: %2d | S: %d'%(d,m,n,s))
+    print('Dig: %d | M: %2d | N: %2d | S: %d' % (d, m, n, s))
     tot += s
 
 print('Solution:', tot)

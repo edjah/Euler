@@ -1,10 +1,27 @@
-from time import clock
+import time
+from itertools import combinations
 
-def time_function(f, *args):
-    start = clock()
-    f(*args)
-    end = clock()
-    return end - start
+def time_function(f):
+    def func(*args, **kwargs):
+        start = 1000 * time.time()
+        result = f(*args, **kwargs)
+        end = 1000 * time.time()
+
+        args_str = ", ".join(map(str, args))
+        kwargs_str = ", ".join("{}={}".format(k, v) for k, v in kwargs.items())
+        if args_str and kwargs_str:
+            kwargs_str = ", " + kwargs_str
+        print(f"{f.__name__}({args_str}{kwargs_str}): {end - start:.3f} ms")
+
+        return result
+
+    return func
+
+
+def subsets(a, nonempty=True):
+    for i in range(int(nonempty), len(a) + 1):
+        for tup in combinations(a, i):
+            yield tup
 
 def nCr(n, k):
     ans = 1
@@ -18,7 +35,29 @@ def nCr_tbl(n):
         tbl[i + 1] = (tbl[i] * (n - i)) // (i + 1)
     return tbl
 
+def memoize(f):
+    cache = {}
+    def func(*args, **kwargs):
+        if args not in cache:
+            cache[args] = f(*args, **kwargs)
+        return cache[args]
+
+    return func
+
+def find_missing(start, end):
+    import os
+    import re
+
+    regex = re.compile(r'.*(\d{3})\.(py|c|cpp|java).*')
+    present = set()
+    for filename in os.listdir('.'):
+        match = regex.match(filename)
+        if match:
+            present.add(int(match.group(1)))
+
+    should_have = set(range(start, end + 1))
+
+    return sorted(should_have - present)
+
 if __name__ == '__main__':
-    x = nCr_tbl(10)
-    print(x)
-    print(time_function(nCr_tbl, 100000))
+    print(find_missing(1, 100))

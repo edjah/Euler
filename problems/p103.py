@@ -44,7 +44,7 @@ def optimum(prev, n):
 
         seen.add((s, idx))
         a = list(s)
-        for i in range(-4, 4):
+        for i in range(-2, 2):
             a[idx] -= i
             optimize(tuple(sorted(a)), idx + 1)
 

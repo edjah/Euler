@@ -4,6 +4,7 @@ prime_list = None
 prime_set = set()
 miller_rabin_nums = [2, 3, 5, 7, 11, 13, 17]
 large_miller_rabin_nums = [19, 23, 29, 31, 37, 41]
+
 def init(n):
     global prime_list, prime_set
     if n <= 10 ** 8:
@@ -107,12 +108,12 @@ def prime_factors(n):
     facs = []
     i = 0
     c = n
-    while c != 1:
+    while c > 1:
         if c % prime_list[i] == 0:
-            c /= prime_list[i]
+            c //= prime_list[i]
             facs.append(prime_list[i])
-            i = -1
-        i += 1
+        else:
+            i += 1
     return facs
 
 def totient(n):

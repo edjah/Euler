@@ -90,7 +90,6 @@ class PriorityQueue:
     def insert(self, k, v):
         self.heap.insert((v, k))
 
-
 class Edge:
     def __init__(self, a, b, weight):
         self.a = a
@@ -118,3 +117,29 @@ class Graph:
         e = Edge(u, v, weight)
         self.adj[u].append(e)
         self.adj[v].append(e)
+
+class UnionFind:
+    def __init__(self, size):
+        self.parent = list(range(size))
+        self.rank = [0] * size
+
+    def find(self, u):
+        if self.parent[u] != u:
+            self.parent[u] = self.find(self.parent[u])
+        return self.parent[u]
+
+    def union(self, u, v):
+        u_root = self.find(u)
+        v_root = self.find(v)
+
+        if u_root == v_root:
+            return
+
+        if self.rank[u_root] < self.rank[v_root]:
+            self.parent[u_root] = v_root
+        elif self.rank[u_root] > self.rank[v_root]:
+            self.parent[v_root] = u_root
+        else:
+            self.parent[u_root] = v_root
+            self.rank[v_root] += 1
+

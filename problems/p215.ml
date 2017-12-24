@@ -23,7 +23,6 @@ let main r c = w [] [] r r c ;;
 
 let _ =
     let start = Sys.time () in
-  let argi n = int_of_string Sys.argv.(n) in
-  let _ = printf "Solution: %d\n" (main (argi 1) (argi 2)) in
-  let finish = Sys.time () in
-  printf "%f seconds to run\n" (finish -. start)
+    let _ = printf "Solution: %d\n" (main 32 10) in
+    let end = Sys.time () in
+    printf "%f seconds to run\n" (end -. start)

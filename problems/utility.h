@@ -1,9 +1,30 @@
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <sys/time.h>
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+static double tstamp_start = 0;
+
+/* Timing Functions */
+double tstamp() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return 1000.0 * tv.tv_sec + tv.tv_usec / 1000.0;
+}
+
+void start_time() {
+    tstamp_start = tstamp();
+}
+
+void end_time() {
+    printf("%.3f ms\n", tstamp() - tstamp_start);
+}
+
+/* Primality testing functions */
 long mod_exp(long x, long exp, long n) {
     long res = 1;
     x %= n;
@@ -63,23 +84,23 @@ int miller_rabin(long n, int k) {
     return 1;
 }
 
-long* sieve(long n) {
-    char *A = malloc(sizeof(char) * (n + 1));
+long* sieve(int n, int* size) {
+    char* A = (char*) malloc(sizeof(char) * (n + 1));
     memset(A, 1, n + 1);
-    for (long i = 2; i * i <= n; i++)
-        if (A[i])
-            for (long j = i*i; j <= n; j += i)
-                A[j] = 0;
 
-    int count = 0;
-    for (long i = 2; i <= n; i++) {
-        if (A[i])
-            count += 1;
+    *size = n - 1;
+    for (int i = 2; i * i <= n; i++) {
+        if (A[i]) {
+            for (int j = i * i; j <= n; j += i) {
+                *size -= A[j];
+                A[j] = 0;
+            }
+        }
     }
-    long *primes = malloc(sizeof(long) * (count + 1));
-    primes[0] = count;
-    long k = 1;
-    for (long i = 2; i <= n; i++) {
+
+    long *primes = (long*) malloc(sizeof(long) * (*size));
+    int k = 0;
+    for (int i = 2; i <= n; i++) {
         if (A[i]) {
             primes[k] = i;
             k += 1;
@@ -87,28 +108,15 @@ long* sieve(long n) {
     }
     free(A);
 
-    // return the primes. the first ele is the number of them
-    return &primes[1];
+    return primes;
 }
 
-
-int main(int argc, char *argv[]) {
-    srand(time(NULL));
-    clock_t start = clock();
-
-    argc = 2;
-    argv[1] = "1000000000";
-    if (argc != 2) {
-        printf("Usage: prime num\n");
-        return 1;
+/* Other utility functions */
+unsigned long nCk(unsigned n, unsigned k) {
+    unsigned long ans = 1;
+    unsigned lim = MIN(k, n - k);
+    for (unsigned long i = 0; i < lim; i++) {
+        ans = (ans * (n - i)) / (i + 1);
     }
-    long n = atol(argv[1]);
-
-    long* primes = sieve(n);
-    int num = primes[-1];
-    printf("Num: %d\n", num);
-
-    double time = (double) (clock() - start) / CLOCKS_PER_SEC;
-    printf("Time: %f seconds\n", time);
+    return ans;
 }
-
