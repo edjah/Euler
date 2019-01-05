@@ -107,7 +107,7 @@ char *nums[100] = {
 int main(void) {
     start_time();
 
-    bignum result = BIGNUM_ZERO;
+    bignum* result = BIGNUM_ZERO;
     for (int i = 0; i < 100; i++) {
         result = bignum_add(result, bignum_from_string(nums[i]));
     }

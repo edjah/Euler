@@ -1,5 +1,5 @@
-from time import perf_counter
-start = perf_counter()
+from lib.utility import start_time, end_time
+
 
 def P(m):
     prod = 1
@@ -7,8 +7,8 @@ def P(m):
         prod *= (2 * i / (m + 1)) ** i
     return int(prod)
 
+
+start_time()
 solution = sum(P(m) for m in range(2, 16))
 print('Solution:', solution)
-
-end = perf_counter()
-print(f"{end - start:f} seconds to run")
+end_time()

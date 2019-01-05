@@ -5,7 +5,7 @@ int main(void) {
     start_time();
 
     int size;
-    long* primes = sieve(2000000, &size);
+    int* primes = sieve(2000000, &size);
     long tot = 0;
     for (int i = 0; i < size; i++) {
         tot += primes[i];

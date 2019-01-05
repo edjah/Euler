@@ -26,7 +26,6 @@ int main(void) {
 
     long max = 0;
     int k = 13;
-    int n = strlen(MESSAGE);
     for (int i = 0, n = strlen(MESSAGE); i <= n - k; i++) {
         long prod = 1;
         for (int j = i; j < i + k; j++) {

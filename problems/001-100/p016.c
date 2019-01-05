@@ -5,8 +5,8 @@
 int main(void) {
     start_time();
 
-    bignum pow = bignum_from_long(1000);
-    bignum ans = bignum_mod_exp(BIGNUM_TWO, pow, BIGNUM_ZERO);
+    bignum* pow = bignum_from_long(1000);
+    bignum* ans = bignum_mod_exp(BIGNUM_TWO, pow, NULL);
     char* s = bignum_to_string(ans);
 
     int tot = 0;

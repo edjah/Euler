@@ -1,6 +1,6 @@
 #include "lib/utility.h"
 
-// this is here because p067.c inherits p018.c
+// this is here because p067.cpp inherits p018.c
 #ifndef DATA_FILE
 #define DATA_FILE "files/p018_triangle.txt"
 #define LIMIT 15
