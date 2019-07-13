@@ -1,21 +1,14 @@
-from time import perf_counter
-from itertools import combinations
-start = perf_counter()
+from lib.utility import start_time, end_time, subsets
+start_time()
 
-def power_set(s):
-    a = []
-    for n in range(len(s) + 1):
-        for x in combinations(s, n):
-            a.append(set(x))
-    return a
 
-def works(s):
+def check_special_sum_set(s):
     if len(set(s)) != len(s):
         return False
+
     s = set(s)
-    subsets = power_set(s)
-    for x in subsets:
-        for y in power_set(s - x):
+    for x in subsets(s):
+        for y in subsets(s - set(x)):
             if len(x) == len(y) == 0:
                 continue
             a, b = sum(x), sum(y)
@@ -28,34 +21,39 @@ def works(s):
     return True
 
 
-
 def optimum(prev, n):
+    # start off with the heuristic
     b = prev[len(prev) // 2]
-    best = (b, *(a + b for a in prev))
+    best = (b,) + tuple(a + b for a in prev)
+    assert check_special_sum_set(best)
+
     seen = set()
+
+    # fine tune the heuristic solution by searching nearby solutions
     def optimize(s, idx):
+        nonlocal best
+
         if (s, idx) in seen:
             return
-        nonlocal best
+
         if idx >= n:
-            if works(s) and sum(s) < sum(best):
+            if check_special_sum_set(s) and sum(s) < sum(best):
                 best = s
             return
 
         seen.add((s, idx))
-        a = list(s)
         for i in range(-2, 2):
-            a[idx] -= i
-            optimize(tuple(sorted(a)), idx + 1)
+            a = list(s)
+            a[idx] += i
+            if check_special_sum_set(a[:idx + 1]):
+                optimize(tuple(sorted(a)), idx + 1)
 
+    print('Original sum:', sum(best))
     optimize(best, 0)
-    print('Best sum:', sum(best))
+    print('Optimized sum:', sum(best))
     return sorted(best)
 
+
 a = optimum([11, 18, 19, 20, 22, 25], 7)
-print(a)
 print('Solution:', ''.join(str(i) for i in a))
-
-
-end = perf_counter()
-print(end - start, 'seconds to run')
+end_time()

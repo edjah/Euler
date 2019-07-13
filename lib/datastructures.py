@@ -1,10 +1,16 @@
 class HeapEmpty(Exception):
     pass
 
+
 # min heap by default, but custom comparison functions are possible
 class Heap:
-    standard_cmp = lambda x, y: 1 if x < y else (-1 if x > y else 0)
-    def __init__(self, array=[], compare=standard_cmp, kv_mode=False):
+    def standard_cmp(x, y):
+        return 1 if x < y else (-1 if x > y else 0)
+
+    def __init__(self, array=None, compare=standard_cmp, kv_mode=False):
+        if array is None:
+            array = []
+
         self.compare = compare
         self.heap = [None, *array]
         self.kv_mode = kv_mode
@@ -13,7 +19,7 @@ class Heap:
         if self.kv_mode:
             self.indices = {}
         if len(array) > 0:
-            for i in reversed(range(1, self._size//2 + 1)):
+            for i in reversed(range(1, self._size // 2 + 1)):
                 self.heapify(i)
             if self.kv_mode:
                 for i in range(1, len(self.heap)):
@@ -64,15 +70,16 @@ class Heap:
             if self.kv_mode:
                 self.indices[n[1]] = self._size
             x = self._size
-        while (x != 1 and self.compare(h[x//2], h[x]) < 0):
-            h[x], h[x//2] = h[x//2], h[x]
+        while (x != 1 and self.compare(h[x // 2], h[x]) < 0):
+            h[x], h[x // 2] = h[x // 2], h[x]
             if self.kv_mode:
                 self.indices[h[x][1]] = x
-                self.indices[h[x//2][1]] = x // 2
+                self.indices[h[x // 2][1]] = x // 2
             x //= 2
 
     def size(self):
         return self._size
+
 
 class PriorityQueue:
     def __init__(self):
@@ -90,6 +97,7 @@ class PriorityQueue:
     def insert(self, k, v):
         self.heap.insert((v, k))
 
+
 class Edge:
     def __init__(self, a, b, weight):
         self.a = a
@@ -103,12 +111,15 @@ class Edge:
             return self.a
         raise ValueError('Edge is not connected to vertex')
 
+
 class Graph:
-    def __init__(self, size, edges=[]):
+    def __init__(self, size, edges=None):
         self._size = size
         self.adj = [[] for i in range(size)]
-        for u, v, weight in edges:
-            self.add_edge(u, v, weight)
+        self.edges = []
+        if edges:
+            for u, v, weight in edges:
+                self.add_edge(u, v, weight)
 
     def size(self):
         return self._size
@@ -117,6 +128,8 @@ class Graph:
         e = Edge(u, v, weight)
         self.adj[u].append(e)
         self.adj[v].append(e)
+        self.edges.append(e)
+
 
 class UnionFind:
     def __init__(self, size):
@@ -142,4 +155,3 @@ class UnionFind:
         else:
             self.parent[u_root] = v_root
             self.rank[v_root] += 1
-

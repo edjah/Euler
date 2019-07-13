@@ -1,40 +1,34 @@
-from time import perf_counter
+from lib.utility import start_time, end_time, product
 from lib.prime import prime_factors_table
-from itertools import combinations
-from functools import reduce
-start = perf_counter()
+start_time()
 
+"""
+(x + y) / (xy) = 1/n
+nx + ny = xy
+nx + ny - xy = 0
+y(n - x) = -nx
 
-facs = prime_factors_table(10 ** 6)
-
-
-def prod(a):
-    return reduce(lambda x, y: x * y, a)
+y = nx / (x - n)
+y = (n^2 - n^2 + nx) / (x - n)
+y = (n^2 + n(x - n)) / (x - n)
+y = n^2 / (x - n) + n
+=> All solutions must have x - n as a divisor of n^2
+=> Count the number of divisors of n^2
+"""
 
 
 def num_solutions(n):
-    uniq = set(facs[n])
-    nums = [2 * facs[n].count(x) for x in sorted(uniq)]
-
-    count = 1
-    if (n == 180180):
-        print(nums)
-    for m in range(1, len(nums) + 1):
-        for tup in combinations(nums, m):
-            count += prod(tup)
-
-    return (count + 1) // 2
+    uniq = set(prime_factors[n])
+    exponents = [2 * prime_factors[n].count(x) for x in uniq]
+    num_divisors = product(1 + exp for exp in exponents)
+    return (num_divisors + 1) // 2
 
 
-best = 0
-for n in range(10 ** 6):
-    x = num_solutions(n)
-    if x > best:
-        print(f"New best: {n} has {x} solutions")
-        best = x
+prime_factors = prime_factors_table(10 ** 6)
 
-    if x > 1000:
-        break
+n = 0
+while num_solutions(n) <= 1000:
+    n += 1
 
-end = perf_counter()
-print(f"{end - start:f} seconds to run")
+print('Solution:', n)
+end_time()

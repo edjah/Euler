@@ -37,6 +37,8 @@
 
 #define INSERTION_SORT_CUTOFF 32
 
+typedef __int128 bigint;
+typedef unsigned __int128 ubigint;
 
 /* Timing Functions */
 static double tstamp_start = 0;
@@ -64,25 +66,25 @@ void end_time() {
 
 
 /* Primality testing functions */
-unsigned long mod_exp(unsigned long b, unsigned long exp, unsigned long mod) {
-    unsigned long result = 1;
+ubigint mod_exp(ubigint b, ubigint exp, ubigint mod) {
+    ubigint result = 1;
     b %= mod;
     while (exp) {
-        if (exp & 1) {
+        if (exp % 2 == 1) {
             result = (result * b) % mod;
         }
-        exp >>= 1;
+        exp /= 2;
         b = (b * b) % mod;
     }
     return result;
 }
 
-bool __miller(unsigned d, unsigned n, unsigned a) {
+bool __miller(ubigint d, ubigint n, ubigint a) {
     if (n == a) {
         return true;
     }
 
-    unsigned long x = mod_exp(a, d, n);
+    ubigint x = mod_exp(a, d, n);
     if (x == 1 || x == n - 1) {
        return true;
     }
@@ -106,21 +108,34 @@ bool __miller(unsigned d, unsigned n, unsigned a) {
 }
 
 // Returns false if n is composite and returns true if n is prime.
-// Due to overflow, this only works when n < 2^32, so to optimize the function,
+// Due to overflow, this only works when n < 2^64, so to optimize the function,
 // we use a determinstic variant of the Miller-Rabin test (from Wikipedia):
-//     if n < 4,759,123,141, it is enough to test a = 2, 7, and 61
-bool miller_rabin(unsigned n) {
+//     if n < 2^64, it is enough to test a only a few witnesses is necessary
+bool miller_rabin(ubigint n) {
     if (n <= 1) {
         return false;
     }
 
     // Find d such that n - 1 = 2^d * r for some r >= 1
-    unsigned d = n - 1;
+    ubigint d = n - 1;
     while (d % 2 == 0) {
         d /= 2;
     }
 
-    return __miller(d, n, 2) && __miller(d, n, 7) && __miller(d, n, 61);
+    if (n < 4759123141) {
+        return __miller(d, n, 2) && __miller(d, n, 7) && __miller(d, n, 61);
+    }
+
+    static int large_witnesses[] = {
+        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37
+    };
+
+    for (size_t i = 0; i < sizeof(large_witnesses) / sizeof(int); ++i) {
+        if (!__miller(d, n, large_witnesses[i])) {
+            return false;
+        }
+    }
+    return true;
 }
 
 static const int* primes_map = NULL;
@@ -230,7 +245,7 @@ int** prime_factors_tbl(int n, int** _sizes) {
 }
 
 /* Other utility functions */
-unsigned long nCk(unsigned n, unsigned k) {
+inline unsigned long nCk(unsigned n, unsigned k) {
     unsigned long ans = 1;
     unsigned lim = MIN(k, n - k);
     for (unsigned long i = 0; i < lim; i++) {
@@ -239,7 +254,7 @@ unsigned long nCk(unsigned n, unsigned k) {
     return ans;
 }
 
-unsigned long gcd(unsigned long a, unsigned long b) {
+inline unsigned long gcd(unsigned long a, unsigned long b) {
     unsigned long tmp;
     while (b > 0) {
         tmp = b;

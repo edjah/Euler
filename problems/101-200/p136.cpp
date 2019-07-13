@@ -1,18 +1,13 @@
-#include <iostream>
-#include "lib/utility.h"
-using namespace std;
+#include "lib/utility.hh"
 
-#define N 50000000
+constexpr int N = 50000000;
 
 int sol_count[N];
 
-
-int main(void) {
-    start_time();
-
-    for (long x = 0; x < 3 * N / 2; x++) {
+void count_solutions() {
+    for (long x = 0; x < 2 * N; x++) {
         for (long a = x / 5 + 1; a <= x / 2; a++) {
-            long n = (5 * a -  x) * (x - a);
+            long n = (5*a - x) * (x - a);
             if (n >= N) {
                 break;
             }
@@ -25,12 +20,17 @@ int main(void) {
             }
         }
     }
+}
 
+int main(void) {
+    start_time();
+
+    count_solutions();
     int count = 0;
     for (int n = 0; n < N; n++) {
         count += sol_count[n] == 1;
     }
-    cout << "Solution: " << count << endl;
+    printf("Solution: %d\n", count);
 
     end_time();
 }

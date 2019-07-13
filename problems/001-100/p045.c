@@ -9,7 +9,7 @@ bool is_pentagonal(long n) {
 int main(void) {
     start_time();
 
-    // all triangle numbers are hexagonal numbers
+    // all hexagonal numbers are also triangle numbers
     long n = 144;
     while (!is_pentagonal(n * (2*n - 1))) {
         n += 1;

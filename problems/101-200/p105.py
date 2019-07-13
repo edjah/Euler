@@ -1,18 +1,10 @@
-from time import perf_counter
-from itertools import combinations
-start = perf_counter()
+from lib.utility import start_time, end_time, subsets
+start_time()
 
-def power_set(s):
-    a = []
-    for n in range(1, len(s) + 1):
-        for x in combinations(s, n):
-            a.append(set(x))
-    return a
 
 def is_special(s):
-    subsets = power_set(s)
-    for x in subsets:
-        for y in power_set(s - x):
+    for x in subsets(s):
+        for y in subsets(s - set(x)):
             if len(x) == len(y) == 0:
                 continue
             a, b = sum(x), sum(y)
@@ -24,13 +16,13 @@ def is_special(s):
                 return False
     return True
 
-sets = []
-with open('p105_sets.txt', 'r') as f:
+
+total = 0
+with open('files/p105_sets.txt', 'r') as f:
     for line in f:
-        sets.append(set(int(i) for i in line.split(',')))
+        s = set(int(i) for i in line.split(','))
+        if is_special(s):
+            total += sum(s)
 
-ans = sum(sum(i) for i in filter(is_special, sets))
-print('Solution:', ans)
-
-end = perf_counter()
-print(end - start, 'seconds to run')
+print('Solution:', total)
+end_time()

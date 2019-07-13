@@ -1,16 +1,14 @@
-import time
-from math import floor
-start = time.time()
+from lib.utility import start_time, end_time
+start_time()
+
 
 def f(x):
-    return floor(pow(2, 30.403243784 - x**2)) * pow(10, -9)
+    return int(pow(2, 30.403243784 - x**2)) * pow(10, -9)
 
-N = 10 ** 4
+
 un = -1
-for n in range(N):
+for n in range(10000):
     un = f(un)
 
-print(un + f(un))
-
-end = time.time()
-print(f"{1000 * (end - start):.3f} ms")
+print(f'Solution: {un + f(un):.9f}')
+end_time()

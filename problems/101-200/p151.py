@@ -1,13 +1,12 @@
-import time
-import random
+from lib.utility import memoize, start_time, end_time
 from math import log2
-from lib.utility import memoize
-start = time.time()
+start_time()
 
-def get_children(state):
+
+def get_child_states(state):
     children = []
     for paper in state:
-        child = list(state[:])
+        child = list(state)
         child.remove(paper)
         for _ in range(int(log2(paper))):
             paper //= 2
@@ -16,18 +15,17 @@ def get_children(state):
 
     return children
 
+
 @memoize
 def solve(i, prob, state):
-    ans = prob * (len(state) == 1) * (i % 15 > 0)
-    children = get_children(state)
+    ans = prob * (len(state) == 1) * (i != 0 and i != 15)
+    children = get_child_states(state)
     for c in children:
         ans += solve(i + 1, prob / len(children), c)
 
     return ans
 
+
 ans = solve(0, 1, (16,))
 print("Solution: {:.6f}".format(ans))
-
-
-end = time.time()
-print(f"{(end - start):.3f} sec")
+end_time()

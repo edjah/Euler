@@ -1,27 +1,18 @@
-from time import perf_counter
-from fractions import Fraction
-start = perf_counter()
-
-cache = {}
-def F(num, den, result, turn, limit):
-    tup = (num, den, result)
-    if tup in cache:
-        return cache[tup]
-
-    if turn > limit:
-        if result > limit // 2:
-            return Fraction(num, den)
-        return 0
-
-    tot = F(num * turn, den * (turn + 1), result, turn + 1, limit)
-    tot += F(num, den * (turn + 1), result + 1, turn + 1, limit)
-    cache[tup] = tot
-    return tot
-
-prob = F(1, 1, 0, 1, 15)
-print('Prob:', prob, '~=', round(prob * 1.0, 8))
-print('Max prize:', 1 // prob)
+from lib.utility import start_time, end_time, memoize
+start_time()
 
 
-end = perf_counter()
-print(end - start, 'seconds to run')
+@memoize
+def winning_prob(num_blues, turn, turn_limit):
+    if turn > turn_limit:
+        return num_blues > turn_limit // 2
+
+    p = 1 / (turn + 1)
+    pick_blue = winning_prob(num_blues + 1, turn + 1, turn_limit)
+    pick_red = winning_prob(num_blues, turn + 1, turn_limit)
+    return (p * pick_blue) + ((1 - p) * pick_red)
+
+
+winning_prob = winning_prob(0, 1, 15)
+print('Solution:', 1 // winning_prob)
+end_time()

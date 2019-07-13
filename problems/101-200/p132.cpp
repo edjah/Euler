@@ -1,26 +1,25 @@
-#include <iostream>
-#include "lib/utility.h"
-using namespace std;
+#include "lib/utility.hh"
 
-#define N 1000000000
+constexpr long N = 1000000000;
+
+// R(n) = 0 mod p           =>     R(n) + 1 = 1 mod p
+// R(n) = (10^n - 1) / 9    =>     R(n) + 1 = (10^n + 8) / 9
+// 10^n mod p == 1          =>     R(n) + 1 = (1 + 8) / 9 = 1 mod p
 
 bool test_prime(int p) {
-    return mod_exp(10, N % (p - 1), p) == 1;
+    return p >= 7 && mod_exp(10, N, p) == 1;
 }
 
 int main(void) {
     start_time();
 
-    int size;
-    int* primes = sieve(200000, &size);
-
     long tot = 0;
     int count = 0;
-    for (int i = 3; i < size; i++) {
-        if (test_prime(primes[i])) {
-            tot += primes[i];
+    for (int p : get_primes(200000)) {
+        if (test_prime(p)) {
+            tot += p;
             if (++count == 40) {
-                cout << "Solution: " << tot << endl;
+                printf("Solution: %ld\n", tot);
                 break;
             }
         }

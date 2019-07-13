@@ -1,26 +1,24 @@
-from time import perf_counter
-from random import randint
+from lib.utility import start_time, end_time
+start_time()
 
-def palindromic(n):
+
+def is_palindromic(n):
     s = str(n)
     return s == s[::-1]
 
 
-start = perf_counter()
-lim = 10 ** 8
-n = int(lim ** 0.5) + 1
-a = set()
-for s in range(1, n):
-    t = s ** 2
-    for i in range(s + 1, n):
-        t += i ** 2
-        if t > lim:
+palindromic_sum_numbers = set()
+limit = 10 ** 8
+sqrt_limit = 1 + int(limit ** 0.5)
+
+for start in range(1, sqrt_limit):
+    total = start ** 2
+    for i in range(start + 1, sqrt_limit):
+        total += i ** 2
+        if total >= limit:
             break
-        if palindromic(t):
-            a.add(t)
+        if is_palindromic(total):
+            palindromic_sum_numbers.add(total)
 
-print('Solution:', sum(a))
-
-
-end = perf_counter()
-print(end - start, 'seconds to run')
+print('Solution:', sum(palindromic_sum_numbers))
+end_time()

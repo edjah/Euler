@@ -1,5 +1,6 @@
 import time
-from itertools import combinations
+import itertools
+from collections import Counter
 
 __tstamp_start = None
 
@@ -32,10 +33,11 @@ def time_function(f):
         result = f(*args, **kwargs)
         end = time.time()
 
-        args_str = ', '.join(map(repr, args))
-        kwargs_str = ', '.join(f'{k}={repr(v)}' for k, v in kwargs.items())
-        if args_str and kwargs_str:
-            args_str += ', '
+        # args_str = ', '.join(map(repr, args))
+        # kwargs_str = ', '.join(f'{k}={repr(v)}' for k, v in kwargs.items())
+        # if args_str and kwargs_str:
+        #     args_str += ', '
+        args_str = kwargs_str = ''
 
         duration = humanize_duration(end - start)
         print(f'{f.__name__}({args_str}{kwargs_str}): {duration}')
@@ -47,8 +49,19 @@ def time_function(f):
 
 def subsets(a, nonempty=True):
     for i in range(int(nonempty), len(a) + 1):
-        for tup in combinations(a, i):
+        for tup in itertools.combinations(a, i):
             yield tup
+
+
+def multi_subsets(multiset):
+    items = []
+    for item, count in sorted(Counter(multiset).items()):
+        items.append([(item,) * c for c in range(count + 1)])
+
+    for combo in itertools.product(*items):
+        result = sum(combo, ())
+        if len(result) > 0:
+            yield result
 
 
 def nCr(n, k):
@@ -65,14 +78,56 @@ def nCr_tbl(n):
     return tbl
 
 
+def product(a):
+    res = 1
+    for x in a:
+        res *= x
+    return res
+
+
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
+
+def multi_gcd(*nums):
+    if len(nums) == 0:
+        return None
+
+    result = nums[0]
+    for n in nums[1:]:
+        result = gcd(result, n)
+    return result
+
+
+def egcd(a, b):
+    if b == 0:
+        return (a, 1, 0)
+    else:
+        d, x, y = egcd(b, a % b)
+        return (d, y, x - (a // b) * y)
+
+
+def is_square(n):
+    s = int(n ** 0.5)
+    return s*s == n
+
+
+def mod_inverse(r, modulus):
+    gcd, x, y = egcd(r, modulus)
+    assert gcd == 1, f'{r} does not have an inverse modulo {modulus}'
+    return x % modulus
+
+
 def memoize(f):
-    cache = {}
 
     def func(*args, **kwargs):
-        if args not in cache:
-            cache[args] = f(*args, **kwargs)
-        return cache[args]
+        if args not in func.cache:
+            func.cache[args] = f(*args, **kwargs)
+        return func.cache[args]
 
+    func.cache = {}
     return func
 
 

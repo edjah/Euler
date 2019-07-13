@@ -1,7 +1,7 @@
-import time
-from lib.utility import memoize
+from lib.utility import start_time, end_time
 from collections import deque
-start = time.time()
+start_time()
+
 
 def random_generator():
     k = 1
@@ -27,6 +27,7 @@ def best_in_series(series):
             curr = 0
 
     return best
+
 
 def max_sum_subsequence(M):
     size = len(M)
@@ -57,12 +58,11 @@ def max_sum_subsequence(M):
 
     return best
 
+
 rand = random_generator()
 nums = [next(rand) for i in range(4 * 10 ** 6)]
 mat = [nums[2000*i:2000*(i + 1)] for i in range(2000)]
 
 a = max_sum_subsequence(mat)
-print("Solution:", a)
-
-end = time.time()
-print(f"{end - start:.3f} sec")
+print('Solution:', a)
+end_time()

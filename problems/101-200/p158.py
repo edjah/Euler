@@ -1,17 +1,10 @@
-from time import perf_counter
-start = perf_counter()
+from lib.utility import start_time, end_time, nCr
+start_time()
+
 
 def p(n):
-    if n == 3:
-        return 26 * 25 * 16
-
-import lib.prime as prime
-prime.init(10 ** 5)
-
-print(prime.prime_factors(10400))
-
-print(p(3))
+    return nCr(26, n) * (2**n - n - 1)
 
 
-end = perf_counter()
-print(end - start, 'seconds to run')
+print('Solution:', max(p(n) for n in range(27)))
+end_time()

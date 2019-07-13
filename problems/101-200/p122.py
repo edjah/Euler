@@ -1,30 +1,32 @@
-from time import perf_counter
-from itertools import combinations
-start = perf_counter()
+from lib.utility import start_time, end_time
+start_time()
 
 
 def M(N):
     optimals = {1: 0}
-    curr, nxt = [(1,)], []
-    step = 0
-    while not all(i in optimals for i in range(2, N + 1)):
-        step += 1
+    computed_sets, next_computed_sets = [(1,)], []
+    num_steps = 0
+
+    while len(optimals) < 200:
+        num_steps += 1
         tmp_opts = {}
-        for tup in curr:
-            for i in range(len(tup)):
-                for j in range(i, len(tup)):
-                    x = tup[i] + tup[j]
+        for values in computed_sets:
+            for i in range(len(values)):
+                for j in range(i, len(values)):
+                    x = values[i] + values[j]
+                    if x > N:
+                        break
                     if x not in optimals:
-                        tmp_opts[x] = step
-                        nxt.append(tup + (x,))
+                        tmp_opts[x] = num_steps
+                        next_computed_sets.append(values + (x,))
 
         optimals.update(tmp_opts)
-        curr, nxt = nxt, []
+        computed_sets, next_computed_sets = next_computed_sets, []
 
-    return sum(optimals[i] for i in range(2, N + 1))
+    return sum(optimals[i] for i in range(1, N + 1))
+
 
 sol = M(200)
 print('Solution:', sol)
 
-end = perf_counter()
-print(end - start, 'seconds to run')
+end_time()

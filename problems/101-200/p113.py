@@ -1,34 +1,25 @@
-from time import perf_counter, sleep
-from math import factorial
-start = perf_counter()
+from lib.utility import start_time, end_time, memoize
+start_time()
 
 
-nd_cache = {}
-def non_decreasing(a, b):
-    if (a, b) in nd_cache:
-        return nd_cache[(a, b)]
-    if b <= 0:
+@memoize
+def increasing(min_digit, num_digits):
+    if num_digits <= 0:
         return 1
-    c = 0
-    for i in range(a, 10):
-        c += non_decreasing(i, b - 1)
 
-    nd_cache[(a, b)] = c
-    return c
+    count = 0
+    for i in range(min_digit, 10):
+        count += increasing(i, num_digits - 1)
+    return count
 
 
-def non_increasing(a, b):
-    c = 0
-    for i in range(0, a + 1):
-        c += non_decreasing(i, b - 1)
-    return c
+def decreasing(max_digit, num_digits):
+    return increasing(10 - max_digit - 1, num_digits)
 
-t = 0
-for d in range(1, 100001):
-    t += non_increasing(9, d) - 9
-    t += non_decreasing(1, d) - 1
 
-print(t)
+total = 0
+for d in range(1, 101):
+    total += increasing(1, d) + decreasing(9, d) - 10
 
-end = perf_counter()
-print(end - start, 'seconds to run')
+print('Solution:', total)
+end_time()

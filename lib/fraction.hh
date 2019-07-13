@@ -97,6 +97,8 @@ class Fraction {
 
         Fraction pow(long exp) const;
 
+        size_t hash() const;
+
         static const Fraction ZERO;
         static const Fraction ONE;
 
@@ -357,6 +359,22 @@ Fraction Fraction::pow(long exp) const {
 const Fraction Fraction::ZERO = Fraction(0);
 const Fraction Fraction::ONE = Fraction(1);
 
+
+/*******************
+* Other operations *
+********************/
+size_t Fraction::hash() const {
+    return 61 * num().hash() + den().hash();
+}
+
+namespace std {
+    template <>
+    struct hash<Fraction> {
+        size_t operator()(const Fraction& f) const {
+            return f.hash();
+        }
+    };
+}
 
 std::ostream& operator<<(std::ostream& os, const Fraction& f) {
     os << "Fraction(" << f.to_string() << ")";

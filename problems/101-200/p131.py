@@ -1,6 +1,6 @@
-from time import perf_counter
+from lib.utility import start_time, end_time
 from lib.prime import miller_rabin
-start = perf_counter()
+start_time()
 
 N = 10 ** 6
 ans = k = p = 0
@@ -10,6 +10,4 @@ while p <= N:
     k += 1
 
 print('Solution:', ans)
-
-end = perf_counter()
-print(end - start, 'seconds to run')
+end_time()

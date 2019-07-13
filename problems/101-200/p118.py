@@ -1,9 +1,10 @@
-from time import perf_counter
+from lib.utility import start_time, end_time
 from lib.prime import read_primes, miller_rabin
 from itertools import permutations
-start = perf_counter()
+start_time()
 
-prime_set = set(read_primes(10 ** 8))
+prime_set = set(read_primes(10 ** 6))
+
 
 def get_possible_primes():
     digits = '123456789'
@@ -11,48 +12,41 @@ def get_possible_primes():
     for k in range(1, 10):
         for p in permutations(digits, k):
             x = int(''.join(p))
-            if (k < 9 and x in prime_set) or miller_rabin(x):
-                k_digit_primes[k].append(x)
+            if (k < 6 and x in prime_set) or miller_rabin(x):
+                k_digit_primes[k].append(str(x))
 
-    t = 0
-    for i in range(len(k_digit_primes)):
-        print(i, '-', len(k_digit_primes[i]))
-        t += len(k_digit_primes[i])
     return k_digit_primes
 
 
-def verify_set(s):
-    x = ''.join(str(i) for i in s)
-    return len(set(x)) == len(x) == 9
-
-def build_pandigital_sets(kd_primes):
-    valid = set()
+def build_pandigital_sets():
+    k_digit_primes = get_possible_primes()
+    solutions = set()
     seen = set()
-    tot = 0
-    def rec(acc, n):
-        nonlocal tot
-        if acc in seen:
-            tot += 1
+
+    def find_solutions(acc, remaining_digits):
+        if acc in seen or remaining_digits < 0:
             return
-        if n <= 0:
-            verify_set(acc) and valid.add(acc)
+
+        if remaining_digits == 0:
+            solutions.add(acc)
             return
+
         seen.add(acc)
-        for m in range(1, n + 1):
-            for p in kd_primes[m]:
-                if p in acc:
+        for digits in range(1, remaining_digits + 1):
+            for prime in k_digit_primes[digits]:
+                set_string = ''.join(acc) + prime
+                if len(set_string) != len(set(set_string)):
                     continue
-                t = tuple(sorted(acc + (p,)))
-                rec(t, n - m)
 
-    rec((), 9)
-    print('Size of seen:', tot)
-    return valid
+                new_acc = tuple(sorted(acc + (prime,)))
+                find_solutions(new_acc, remaining_digits - digits)
 
-k_digit_primes = get_possible_primes()
-prime_sets = build_pandigital_sets(k_digit_primes)
+    find_solutions((), 9)
+    return solutions
 
+
+prime_sets = build_pandigital_sets()
 print('Solution:', len(prime_sets))
 
-end = perf_counter()
-print(end - start, 'seconds to run')
+
+end_time()

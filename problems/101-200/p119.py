@@ -1,23 +1,19 @@
-from time import perf_counter
-start = perf_counter()
+from lib.utility import start_time, end_time
+start_time()
 
-cache = {}
-def calc(a, l, k):
-    if l > 1 or a > 2:
-        return 0
-    elif k <= 0:
-        return 1
-    elif (a, l, k) in cache:
-        return cache[(a, l, k)]
-    t = 0
-    t += calc(0, l, k - 1)
-    t += calc(a + 1, l, k - 1)
-    t += calc(0, l + 1, k - 1)
-    cache[(a, l, k)] = t
-    return t
+max_base = 100
+max_exp = 25
 
-print(calc(0, 0, 30))
+digit_power_sum_numbers = set()
 
+for base in range(max_base):
+    for exp in range(max_exp):
+        n = base ** exp
+        digit_sum = sum(int(i) for i in str(n))
+        if digit_sum == base and n >= 10:
+            digit_power_sum_numbers.add(n)
 
-end = perf_counter()
-print(end - start, 'seconds to run')
+a = sorted(digit_power_sum_numbers)
+print('Solution:', a[29])
+
+end_time()

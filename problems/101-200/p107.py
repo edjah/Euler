@@ -1,45 +1,37 @@
-from time import perf_counter
-from lib.datastructures import PriorityQueue, Graph
-start = perf_counter()
+from lib.utility import start_time, end_time
+from lib.datastructures import Graph, UnionFind
+start_time()
 
 
-def prim_mst(G):
-    pq = PriorityQueue()
-    pq.insert(0, 0)
-    seen = [False] * G.size()
-    dist = [float('inf')] * G.size()
-    dist[0] = 0
-    while pq.size() != 0:
-        v = pq.pop()[1]
-        seen[v] = True
-        for e in G.adj[v]:
-            w = e.other(v)
-            if not seen[w] and dist[w] > e.weight:
-                dist[w] = e.weight
-                pq.insert(w, dist[w])
-    return sum(dist)
+# kruskal's algorithm
+def compute_mst_weight(G):
+    total_dist = 0
+    disjoint_set = UnionFind(G.size())
+    for edge in sorted(G.edges, key=lambda e: e.weight):
+        if disjoint_set.find(edge.a) != disjoint_set.find(edge.b):
+            total_dist += edge.weight
+            disjoint_set.union(edge.a, edge.b)
+
+    return total_dist
 
 
-mat = [[None] * 40 for i in range(40)]
-with open('p107_network.txt', 'r') as f:
-    for i, line in enumerate(f):
-        for j, c in enumerate(line.rstrip().split(',')):
-            if c == '-': continue
-            mat[i][j] = int(c)
-
-edges = []
-for i in range(len(mat) - 1):
-    for j in range(i + 1, len(mat)):
-        if mat[i][j] is not None:
-            edges.append((i, j, mat[i][j]))
-
-graph = Graph(len(mat), edges)
-redudant_weight = sum(e[2] for e in edges)
-mst = prim_mst(graph)
-print('Redudant:', redudant_weight)
-print('MST Weight:', mst)
-print('Solution:', redudant_weight - mst)
+def parse_edges():
+    edges = []
+    with open('files/p107_network.txt', 'r') as f:
+        for i, line in enumerate(f):
+            for j, c in enumerate(line.rstrip().split(',')):
+                if c != '-' and i < j:
+                    edges.append((i, j, int(c)))
+    return edges
 
 
-end = perf_counter()
-print(end - start, 'seconds to run')
+edges = parse_edges()
+num_nodes = 1 + max(e[1] for e in edges)
+graph = Graph(num_nodes, edges)
+redundant = sum(e[2] for e in edges)
+mst_weight = compute_mst_weight(graph)
+
+print('Redundant:', redundant)
+print('MST Weight:', mst_weight)
+print('Solution:', redundant - mst_weight)
+end_time()

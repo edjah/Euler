@@ -32,7 +32,6 @@ void visit_partition(const std::vector<int>& nums, const std::vector<int>& a) {
 
 // This enumerates all of the partitions of a multiset. source: TAOCP pre-fasc3b
 // This could be optimized by avoiding generating duplicate partitions.
-// (which this algorithm currently does)
 void enumerate_partitions(const std::vector<int>& numbers) {
     std::vector<int> a = std::vector<int>(numbers.size());
     std::vector<int> b = std::vector<int>(numbers.size(), 1);

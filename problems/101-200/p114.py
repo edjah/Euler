@@ -1,23 +1,20 @@
-from time import perf_counter
-start = perf_counter()
+from lib.utility import start_time, end_time, memoize
+start_time()
 
-cache = {}
-def ways(length, red):
-    if (length, red) in cache:
-        return cache[(length, red)]
+
+@memoize
+def count_ways(length, is_red=False):
     if length < 0:
-        return 1
+        return 0
     elif length == 0:
         return 1
-    tot = ways(length - 1, False)
-    if not red:
+
+    tot = count_ways(length - 1, False)
+    if not is_red:
         for i in range(3, length + 1):
-            tot += ways(length - i, True)
-    cache[(length, red)] = tot
+            tot += count_ways(length - i, True)
     return tot
 
-ans = ways(50, False)
-print('Solution:', ans)
 
-end = perf_counter()
-print(end - start, 'seconds to run')
+print('Solution:', count_ways(50, False))
+end_time()

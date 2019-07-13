@@ -1,21 +1,21 @@
-from time import perf_counter
+from lib.utility import start_time, end_time
 from lib.prime import read_primes
-start = perf_counter()
+start_time()
 
-primes = read_primes(237740)
-def k(n):
+primes = read_primes(10 ** 6)
+
+
+def r(n):
     p = primes[n - 1]
     p_sq = p * p
     x = pow(p - 1, n, p_sq) + pow(p + 1, n, p_sq)
     return x % p_sq
 
+
 n = 1
 goal = 10 ** 10
-while k(n) <= goal:
+while r(n) <= goal:
     n += 1
 
 print('Solution:', n)
-
-
-end = perf_counter()
-print(end - start, 'seconds to run')
+end_time()

@@ -54,7 +54,7 @@ def miller_rabin(n, k=25):
         return True
     else:
         for i in range(k):
-            if try_composite(randint(2, n - 2)):
+            if try_composite(randint(2, n - 2), d, n, s):
                 return False
 
     return True
@@ -139,7 +139,6 @@ def totient(n):
 def totient_table(n):
     phi = [0] * (n + 1)
     phi[1] = 1
-    q = int(n ** 0.5) + 1
     for i in range(2, n + 1):
         if phi[i] == 0:
             phi[i] = i - 1

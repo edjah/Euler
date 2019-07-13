@@ -1,25 +1,20 @@
-from time import perf_counter
-start = perf_counter()
+from lib.utility import start_time, end_time, memoize
+start_time()
 
-cache = {}
-def count(s, n):
+
+@memoize
+def count(d0, d1, n):
     if n <= 1:
         return 1
-    tup = (s[-2:], n)
-    if tup in cache:
-        return cache[tup]
 
     tot = 0
-    prev_sum = sum(int(i) for i in s[-2:])
-    for digit in range(10 - prev_sum):
-        tot += count(s + str(digit), n - 1)
+    for digit in range(10 - d0 - d1):
+        tot += count(d1, digit, n - 1)
 
-    cache[tup] = tot
     return tot
 
-d = 20
-ans = sum(count(str(i), d) for i in range(1, 10))
-print('Solution:', ans)
 
-end = perf_counter()
-print(end - start, 'seconds to run')
+d = 20
+ans = sum(count(0, i, d) for i in range(1, 10))
+print('Solution:', ans)
+end_time()

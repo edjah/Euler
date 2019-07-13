@@ -1,51 +1,29 @@
-from time import perf_counter
+from lib.utility import start_time, end_time
 from lib.prime import read_primes
-from itertools import product
-from functools import reduce
-start = perf_counter()
+start_time()
+
+primes = read_primes(100)
+max_exp = 10
+max_num_primes = 100
+min_num_sols = 4_000_000
 
 
-primes = read_primes(1000)
+def search(max_exp, num_primes=0, n=1, num_divisors=1):
+    if (num_divisors + 1) // 2 > min_num_sols:
+        return n
+    elif num_primes >= max_num_primes:
+        return float('inf')
 
-def prod(a):
-    return reduce(lambda x, y: x * y, a)
+    best_answer = float('inf')
+    for exp in range(1, max_exp + 1):
+        new_num_divisors = num_divisors * (1 + 2 * exp)
+        new_n = n * primes[num_primes] ** exp
+        answer = search(exp, num_primes + 1, new_n, new_num_divisors)
+        best_answer = min(answer, best_answer)
 
-
-def find_sol(n, nprimes, max_count):
-    nums = [2 * i for i in range(1, max_count + 1)]
-    best_count, best_powers = float('inf'), None
-
-    for powers in product(nums, repeat=nprimes):
-        count = (prod(x + 1 for x in powers) + 1) // 2
-        if count > n and count < best_count:
-            best_count, best_powers = count, powers[::-1]
-
-    if best_powers:
-        tot = prod(primes[i] ** (p // 2) for i, p in enumerate(best_powers))
-        return tot
-    else:
-        return None
+    return best_answer
 
 
-target = 4 * 10 ** 6
-
-answer = None
-
-for max_count in range(1, 100):
-    tmp_ans = None
-    for nprimes in range(2, 100):
-        x = find_sol(target, nprimes, max_count)
-        if tmp_ans is None or x < tmp_ans:
-            tmp_ans = x
-        else:
-            break
-
-    if answer is None or tmp_ans < answer:
-        answer = tmp_ans
-    else:
-        break
-
-print(f"Solution: {answer}")
-
-end = perf_counter()
-print(f"{end - start:f} seconds to run")
+answer = search(max_exp)
+print('Solution:', answer)
+end_time()
