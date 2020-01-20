@@ -1,6 +1,6 @@
-from time import perf_counter
+from lib.utility import start_time, end_time
 from lib.prime import read_primes
-start = perf_counter()
+start_time()
 
 primes = read_primes(5 * 10 ** 7)
 
@@ -12,7 +12,5 @@ for i in range(len(primes)):
             break
         tot += 1
 
-print(tot)
-
-end = perf_counter()
-print(end - start, 'seconds to run')
+print('Solution:', tot)
+end_time()

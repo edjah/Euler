@@ -8,11 +8,6 @@ struct triple {
     bool operator==(const triple& other) const {
         return other.a == a && other.b == b && other.c == c;
     }
-    bool operator<(const triple& other) const {
-        return (a < other.a) ||
-               (a == other.a && b < other.b) ||
-               (a == other.a && b == other.b && c < other.c);
-    }
 };
 
 namespace std {

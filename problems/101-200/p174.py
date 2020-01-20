@@ -1,5 +1,5 @@
-from time import perf_counter
-start = perf_counter()
+from lib.utility import start_time, end_time
+start_time()
 
 
 def count(k):
@@ -31,7 +31,4 @@ for i in a:
 
 ans = sum(b[i] for i in range(1, 11))
 print('Solution:', ans)
-
-
-end = perf_counter()
-print(end - start, 'seconds to run')
+end_time()

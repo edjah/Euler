@@ -4,12 +4,16 @@ prime_list = None
 prime_set = set()
 miller_rabin_nums = [2, 3, 5, 7, 11, 13, 17]
 large_miller_rabin_nums = [19, 23, 29, 31, 37, 41]
+primes_file = 'lib/primes.txt'
 
 
 def init(n):
     global prime_list, prime_set
     if n <= 10 ** 8:
-        prime_list = read_primes(n)
+        try:
+            prime_list = read_primes(n)
+        except FileNotFoundError as e:
+            print(f'Unable to find {primes_file}')
 
     if prime_list is None:
         print('Using sieve instead of precomputed primes')
@@ -71,16 +75,13 @@ def rand_prime(k):
 
 def read_primes(n):
     primes = []
-    try:
-        with open('lib/primes.txt', 'r') as f:
-            for line in f:
-                a = int(line)
-                if a > n:
-                    break
-                primes.append(a)
-        return primes
-    except FileNotFoundError:
-        return None
+    with open(primes_file, 'r') as f:
+        for line in f:
+            a = int(line)
+            if a > n:
+                break
+            primes.append(a)
+    return primes
 
 
 def prime_sieve(n):
@@ -132,8 +133,8 @@ def totient(n):
     facs = set(prime_factors(n))
     tot = n
     for x in facs:
-        tot *= 1 - 1/x
-    return int(tot)
+        tot -= tot // x
+    return tot
 
 
 def totient_table(n):
@@ -153,6 +154,15 @@ def totient_table(n):
                 phi[i * j] = f * phi[q]
                 j = j + 1
     return phi
+
+
+def list_coprime_numbers(n, up_to):
+    mask = [1] * (up_to + 1)
+    for f in set(prime_factors(n)):
+        for i in range(0, up_to + 1, f):
+            mask[i] = 0
+
+    return [i for i in range(len(mask)) if mask[i] == 1]
 
 
 if __name__ == "__main__":

@@ -111,8 +111,8 @@ bool __miller(ubigint d, ubigint n, ubigint a) {
 // Due to overflow, this only works when n < 2^64, so to optimize the function,
 // we use a determinstic variant of the Miller-Rabin test (from Wikipedia):
 //     if n < 2^64, it is enough to test a only a few witnesses is necessary
-bool miller_rabin(ubigint n) {
-    if (n <= 1) {
+bool miller_rabin(unsigned long n) {
+    if (n <= 1 || (n > 3 && n % 2 == 0)) {
         return false;
     }
 

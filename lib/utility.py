@@ -91,6 +91,10 @@ def gcd(a, b):
     return a
 
 
+def lcm(a, b):
+    return (a * b) // gcd(a, b)
+
+
 def multi_gcd(*nums):
     if len(nums) == 0:
         return None
@@ -102,6 +106,9 @@ def multi_gcd(*nums):
 
 
 def egcd(a, b):
+    """
+    returns (d, x, y) such that x*a + y*b == d
+    """
     if b == 0:
         return (a, 1, 0)
     else:
@@ -121,7 +128,6 @@ def mod_inverse(r, modulus):
 
 
 def memoize(f):
-
     def func(*args, **kwargs):
         if args not in func.cache:
             func.cache[args] = f(*args, **kwargs)
@@ -129,6 +135,22 @@ def memoize(f):
 
     func.cache = {}
     return func
+
+
+def chunks(it, n):
+    if isinstance(it, (list, tuple, str)):
+        for i in range(0, len(it), n):
+            yield it[i:i+n]
+    else:
+        chunk = []
+        for x in it:
+            chunk.append(x)
+            if len(chunk) == n:
+                yield chunk
+                chunk = []
+
+        if chunk:
+            yield chunk
 
 
 def find_missing(start, end):

@@ -130,11 +130,31 @@ class Graph:
         self.adj[v].append(e)
         self.edges.append(e)
 
+    def dijkstra(self, s):
+        n = self._size
+        pq = PriorityQueue()
+        pq.insert(s, 0)
+        visited = [False] * n
+        dist = [float('inf')] * n
+
+        while pq.size() != 0:
+            weight, u = pq.pop()
+            dist[u] = weight
+            visited[u] = True
+            for edge in self.adj[u]:
+                v = edge.other(u)
+                if not visited[v]:
+                    dist[v] = min(dist[v], weight + edge.weight)
+                    pq.insert(v, dist[v])
+
+        return {'dist': dist}
+
 
 class UnionFind:
     def __init__(self, size):
         self.parent = list(range(size))
         self.rank = [0] * size
+        self.num_children = [1] * size
 
     def find(self, u):
         if self.parent[u] != u:
@@ -150,8 +170,11 @@ class UnionFind:
 
         if self.rank[u_root] < self.rank[v_root]:
             self.parent[u_root] = v_root
+            self.num_children[v_root] += self.num_children[u_root]
         elif self.rank[u_root] > self.rank[v_root]:
             self.parent[v_root] = u_root
+            self.num_children[u_root] += self.num_children[v_root]
         else:
             self.parent[u_root] = v_root
+            self.num_children[v_root] += self.num_children[u_root]
             self.rank[v_root] += 1

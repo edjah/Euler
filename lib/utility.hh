@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include <numeric>
 #include <random>
+#include <tuple>
 
 std::vector<int> get_primes(int n) {
     int size;
@@ -164,8 +165,19 @@ std::vector<int> totient_table(int n) {
     return phi;
 }
 
+std::tuple<long, long, long> egcd(long a, long b) {
+    // returns (d, x, y) such that x*a + y*b == d
+    if (b == 0) {
+        return {a, 1, 0};
+    } else {
+        auto [d, x, y] = egcd(b, a % b);
+        return {d, y, x - (a / b) * y};
+    }
+}
+
 std::vector<std::vector<int>> prime_factors_table(unsigned n) {
     std::vector<std::vector<int>> tbl{n + 1};
+
     for (unsigned i = 2; i <= n; ++i) {
         if (tbl[i].empty()) {
             for (unsigned j = i; j <= n; j += i) {
@@ -263,6 +275,21 @@ std::pair<size_t, T> argmax(const std::vector<T>& vec, const size_t start = 0) {
 }
 
 
+template<typename AccumT, typename container_t>
+AccumT vector_sum(const container_t& vec) {
+    AccumT tot = AccumT();
+    for (auto x : vec) {
+        tot += x;
+    }
+    return tot;
+}
+
+template<typename T>
+T vector_sum(const std::vector<T>& vec) {
+    return vector_sum<T>(vec);
+}
+
+
 template<typename container_t>
 std::vector<size_t> idx_sort(const container_t& vec, bool reverse = false) {
     std::vector<size_t> idx = arange(vec.size());
@@ -270,4 +297,75 @@ std::vector<size_t> idx_sort(const container_t& vec, bool reverse = false) {
         return reverse ? (vec[i] > vec[j]) : (vec[i] < vec[j]);
     });
     return idx;
+}
+
+
+// from: https://www.variadic.xyz/2018/01/15/hashing-stdpair-and-stdtuple/
+template<typename T>
+inline void hash_combine(size_t& seed, const T& val) {
+    std::hash<T> hasher;
+    seed ^= hasher(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+
+namespace std {
+    template <typename T1, typename T2>
+    struct hash<pair<T1, T2>> {
+        size_t operator()(const pair<T1, T2>& p) const {
+            size_t seed = 0;
+            hash_combine(seed, p.first);
+            hash_combine(seed, p.second);
+            return seed;
+        }
+    };
+
+    template <typename... TupleArgs>
+    struct hash<tuple<TupleArgs...>> {
+      private:
+        // this is a termination condition: N == sizeof...(TupleArgs)
+        template <size_t N = 0>
+        inline typename std::enable_if<N == sizeof...(TupleArgs), void>::type
+        hash_combine_tup(size_t& seed, const tuple<TupleArgs...>& tup) const {
+        }
+
+        // this is the computation workhorse: N < sizeof...(TupleArgs)
+        template <size_t N = 0>
+        inline typename std::enable_if<N != sizeof...(TupleArgs), void>::type
+        hash_combine_tup(size_t& seed, const tuple<TupleArgs...>& tup) const {
+            hash_combine(seed, std::get<N>(tup));
+            hash_combine_tup<N + 1>(seed, tup);
+        }
+
+
+      public:
+        size_t operator()(const tuple<TupleArgs...>& tup) const {
+            size_t seed = 0;
+            hash_combine_tup(seed, tup);
+            return seed;
+        }
+    };
+
+    template <>
+    struct hash<__int128> {
+        size_t operator()(const __int128& p) const {
+            const uint64_t* data = reinterpret_cast<const uint64_t*>(&p);
+
+            size_t seed = 0;
+            hash_combine(seed, data[0]);
+            hash_combine(seed, data[1]);
+            return seed;
+        }
+    };
+
+    template <>
+    struct hash<unsigned __int128> {
+        size_t operator()(const unsigned __int128& p) const {
+            const uint64_t* data = reinterpret_cast<const uint64_t*>(&p);
+
+            size_t seed = 0;
+            hash_combine(seed, data[0]);
+            hash_combine(seed, data[1]);
+            return seed;
+        }
+    };
 }

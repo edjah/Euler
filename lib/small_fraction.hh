@@ -1,3 +1,7 @@
+/*
+    This class only supports non-negative fractions
+    whose numerator and denominator do not exceed 2^64 - 1.
+*/
 struct Fraction {
     Fraction() : num_(0), den_(1) {
     }
@@ -6,6 +10,7 @@ struct Fraction {
     }
 
     Fraction(uint64_t a, uint64_t b) : num_(a), den_(b) {
+        reduce();
     }
 
     uint64_t num() const {
@@ -18,8 +23,7 @@ struct Fraction {
 
     Fraction operator+(const Fraction& other) const {
         Fraction res = *this;
-        res += other;
-        return res;
+        return (res += other);
     }
 
     Fraction& operator+=(const Fraction& other) {
@@ -31,8 +35,7 @@ struct Fraction {
 
     Fraction operator-(const Fraction& other) const {
         Fraction res = *this;
-        res -= other;
-        return res;
+        return (res -= other);
     }
 
     Fraction& operator-=(const Fraction& other) {
@@ -42,10 +45,16 @@ struct Fraction {
         return *this;
     }
 
-    void reduce() {
-        uint64_t g = gcd(num_, den_);
-        num_ /= g;
-        den_ /= g;
+    Fraction operator/(const Fraction& other) const {
+        Fraction res = *this;
+        return (res /= other);
+    }
+
+    Fraction& operator/=(const Fraction& other) {
+        num_ *= other.den_;
+        den_ *= other.num_;
+        reduce();
+        return *this;
     }
 
     // a/b == c/d   => a*d == c*b
@@ -57,8 +66,16 @@ struct Fraction {
         return num_ * other.den_ < other.num_ * den_;
     }
 
+    bool operator<=(const Fraction& other) const {
+        return num_ * other.den_ <= other.num_ * den_;
+    }
+
     bool operator>(const Fraction& other) const {
         return num_ * other.den_ > other.num_ * den_;
+    }
+
+    bool operator>=(const Fraction& other) const {
+        return num_ * other.den_ >= other.num_ * den_;
     }
 
     std::string to_string() const {
@@ -68,15 +85,24 @@ struct Fraction {
         return std::to_string(num_) + "/" + std::to_string(den_);
     }
 
+  private:
+    void reduce() {
+        uint64_t g = gcd(num_, den_);
+        num_ /= g;
+        den_ /= g;
+    }
+
     uint64_t num_;
     uint64_t den_;
 };
 
-Fraction operator/(uint64_t mult, const Fraction& f) {
-    Fraction res;
-    res.num_ = mult * f.den_;
-    res.den_ = f.num_;
-    return res;
+
+Fraction operator*(uint64_t scalar, const Fraction& f) {
+    return Fraction(scalar * f.den(), f.num());
+}
+
+Fraction operator/(uint64_t scalar, const Fraction& f) {
+    return Fraction(scalar * f.den(), f.num());
 }
 
 
@@ -84,7 +110,7 @@ namespace std {
     template <>
     struct hash<Fraction> {
         size_t operator()(const Fraction& f) const {
-            return 61 * f.num_ + f.den_;
+            return 61 * f.num() + f.den();
         }
     };
 }
